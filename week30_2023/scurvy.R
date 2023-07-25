@@ -69,6 +69,6 @@ plot_data |>
     caption = "tidytuesday 2023/07/25 - María Bueno Álvez"
   )
 
-ggsave("scurvy.png", h = 5, w = 10)
+ggsave("week30_2023/scurvy.png", h = 5, w = 10)
 
   
