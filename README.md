@@ -6,7 +6,7 @@
 
 ## About This Repository
 
-Welcome to my TidyTuesday repository! TidyTuesday is a weekly data project aimed at the R community, where we use various datasets to practice data cleaning, analysis, and visualization.
+Welcome to my TidyTuesday repository! [TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master) is a weekly data project aimed at the R community, where we use various datasets to practice data cleaning, analysis, and visualization.
 
 ## Projects
 
