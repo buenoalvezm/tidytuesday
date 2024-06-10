@@ -12,11 +12,15 @@ library(mapdata)
 library(scatterpie)
 library(ggsci)
 library(patchwork)
+library(showtext)
+library(ggimage)
 
 # Read in data
 tuesdata <- tidytuesdayR::tt_load(2024, week = 23)
 cheeses <- tuesdata$cheeses
 
+# Add font
+font_add_google("Roboto", "roboto")
 
 
 ## DATA EXPLORATION
@@ -80,6 +84,15 @@ europe_cheese <-
   pivot_wider(names_from = milk, values_from = n, values_fill = 0) 
   
 
+social <- nrBrand::social_caption(
+  bg_colour = bg_col,
+  icon_colour = highlight_col,
+  font_colour = text_col,
+  font_family = body_font
+)
+
+
+
 # Map plot
 map <- 
   world_map |> 
@@ -95,11 +108,51 @@ map <-
                   cols = colnames(europe_cheese)[-c(1:4)],
                   alpha = 0.7) +
   scale_fill_aaas() +
-  theme_void() 
+  theme_void() +
+  labs(
+    title = "Cheese types in Europe",
+    subtitle = "Based on data from cheese.com"
+  ) +
+  theme(
+    plot.title = element_text(
+      family  = "roboto",
+      face = "bold", 
+      hjust = 0.5,
+      size = 24),
+    plot.subtitle = element_text(
+      family  = "roboto",
+      hjust = 0.5,
+      size = 14)
+  )
+  
 
-# Add title and subtitle
-# Add pie de foto 
-# Fix coordinates
+# Social media details
+social_media <- data.frame(
+  platform = c("twitter", "linkedin", "github"),
+  handle = c("@_buenoalvez", "María Bueno Álvez", "buenoalvezm"),
+  x = c(0, 0.5, 1), 
+  y = c(0, 0, 0),
+  #x = c(1, 1, 1),  # Dummy x-axis values for positioning
+  #y = c(3, 2, 1),  # Dummy y-axis values for positioning
+  image = c("week23_2024/assets/twitter.png", "week23_2024/assets/linkedin.png", "week23_2024/assets/github.png")  
+) 
+
+
+
+# Plot with social media icons 
+#FIX ASPECT RATIO
+# LEGEND
+p_social <- 
+  ggplot(social_media, aes(x, y)) +
+  geom_image(aes(image = image), size = 0.05, asp = 1/1) +
+  geom_text(aes(label = handle, x + 0.05), hjust = 0, vjust = 0.5, size = 5, family = "roboto") +
+ # expand_limits(y=c(-0.01, 0.01)) +
+  expand_limits(x=c(-0.3, 1.3)) +
+  theme_void()
+
+
+map / p_social +
+  plot_layout(heights = c(1,0.5))
 
 # Barplot most common milk
 europe_cheese
