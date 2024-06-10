@@ -77,7 +77,7 @@ europe_cheese <-
   cheese_data |> 
   left_join(country_coords, by = c("country" = "region")) |> 
   relocate(long, lat, .after = country) |> 
-  filter(long < 40,
+  filter(long < 30,
          long > -30,
          lat < 75,
          lat > 30)  |> 
@@ -94,24 +94,38 @@ social <- nrBrand::social_caption(
 
 
 # Map plot
-map <- 
-  world_map |> 
-  filter(long < 40,
+social_media <- data.frame(
+  platform = c("twitter", "linkedin", "github"),
+  handle = c("@_buenoalvez", "María Bueno Álvez", "buenoalvezm"),
+  long = c(-20, 0, 20), 
+  lat = c(25, 25, 25),
+  image = c("week23_2024/assets/twitter.png", "week23_2024/assets/linkedin.png", "week23_2024/assets/github.png")  
+) 
+
+
+world_map |> 
+  filter(long < 30,
          long > -30,
          lat < 75,
          lat > 30) |> 
-  ggplot(aes(x = long, y = lat, group = group)) +
-  geom_polygon(fill = "lightgrey", 
+  ggplot(aes(x = long, y = lat)) +
+  geom_polygon(aes(group = group), 
+               fill = "lightgrey", 
                color = "white") +
   geom_scatterpie(aes(x=long, y=lat, group=country), 
                   data = europe_cheese, 
+                  pie_scale = 1,
                   cols = colnames(europe_cheese)[-c(1:4)],
+                  
                   alpha = 0.7) +
+  geom_image(aes(image = image), size = 0.03, by = "height", asp = 1, data = social_media) +
+  geom_text(aes(label = handle, x = long + 2), hjust = 0, vjust = 0.5, size = 3, family = "roboto", data = social_media) + 
   scale_fill_aaas() +
   theme_void() +
   labs(
     title = "Cheese types in Europe",
-    subtitle = "Based on data from cheese.com"
+    subtitle = "Based on data from cheese.com",
+    fill = "Cheese type"
   ) +
   theme(
     plot.title = element_text(
@@ -122,49 +136,21 @@ map <-
     plot.subtitle = element_text(
       family  = "roboto",
       hjust = 0.5,
-      size = 14)
-  )
-  
+      size = 14),
+    legend.position = c(0.10, 0.20),
+    legend.title = element_text(family = "roboto", size = 12, face = "bold"),
+    legend.text = element_text(family = "roboto", size = 10),
+    legend.justification = c(0, 0),
+    aspect.ratio = 1
+  ) +
+  coord_cartesian(
+    xlim = c(-30, 40),
+    ylim = c(30, 75),
+    expand = FALSE
+  ) +
+  coord_equal() 
 
-# Social media details
-social_media <- data.frame(
-  platform = c("twitter", "linkedin", "github"),
-  handle = c("@_buenoalvez", "María Bueno Álvez", "buenoalvezm"),
-  x = c(0, 0.5, 1), 
-  y = c(0, 0, 0),
-  #x = c(1, 1, 1),  # Dummy x-axis values for positioning
-  #y = c(3, 2, 1),  # Dummy y-axis values for positioning
-  image = c("week23_2024/assets/twitter.png", "week23_2024/assets/linkedin.png", "week23_2024/assets/github.png")  
-) 
-
-
-
-# Plot with social media icons 
-#FIX ASPECT RATIO
-# LEGEND
-p_social <- 
-  ggplot(social_media, aes(x, y)) +
-  geom_image(aes(image = image), size = 0.05, asp = 1/1) +
-  geom_text(aes(label = handle, x + 0.05), hjust = 0, vjust = 0.5, size = 5, family = "roboto") +
- # expand_limits(y=c(-0.01, 0.01)) +
-  expand_limits(x=c(-0.3, 1.3)) +
-  theme_void()
-
-
-map / p_social +
-  plot_layout(heights = c(1,0.5))
-
-# Barplot most common milk
-europe_cheese
-
-
-# Barplot top countries
-europe_cheese
-
-
-# Final plot
-milk_plot + map + country_plot
-
+#ggsave("week23_2024/cheese_map.png", h = 14, w = 14)
 
 ## SESSION INFO  
 sessioninfo::session_info(include_base = TRUE) 
